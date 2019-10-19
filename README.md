@@ -1,5 +1,5 @@
 # Overview
-This is the official API client for the FalconX API.
+This is the official python client for the FalconX API.
 
 API Documentation: http://docs.falconx.io
 
