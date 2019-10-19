@@ -7,18 +7,16 @@ API Documentation: http://docs.falconx.io
 # Quickstart
 
 ```python
-from falconx_py import FalconxClient
+from falconx import FalconxClient
 
-fnx = FalconxClient(key=KEY, secret=SECRET, passphrase=PASSPHRASE)
-
-quote = fnx.get_quote('BTC', 'USD', 5, 'two-way')
-
-result = fnx.execute_quote(quote['fx_quote_id'], 'buy')
+client = FalconxClient(key=KEY, secret=SECRET, passphrase=PASSPHRASE)
+quote = client.get_quote('BTC', 'USD', 5, 'two-way')
+result = client.execute_quote(quote['fx_quote_id'], 'buy')
 ```
 
 # Installation
 ```sh
-pip install falconx-py
+pip install falconx
 ```
 
 # About FalconX
