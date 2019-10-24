@@ -137,6 +137,7 @@ class FalconxClient:
                   "fx_quote_id": "00c884b056f949338788dfb59e495377",
                   "buy_price": 12650,
                   "sell_price": null,
+                  "platform": "api",
                   "token_pair": {
                     "base_token": "BTC",
                     "quote_token": "USD"
@@ -152,7 +153,8 @@ class FalconxClient:
                   "is_filled": false,
                   "side_executed": null,
                   "price_executed": null,
-                  "t_execute": null
+                  "t_execute": null,
+                  "trader_email": "trader1@company.com"
                 }
         """
         if not self.auth:
@@ -160,43 +162,45 @@ class FalconxClient:
 
         return self._process_response(requests.get(self.url + 'quotes/{}'.format(fx_quote_id), auth=self.auth))
 
-    def get_executed_quotes(self, t_start, t_end):
+    def get_executed_quotes(self, t_start, t_end, platform=None):
         """
         Get a historical record of executed quotes in the time range.
         :param t_start: (str) time in ISO8601 format (e.g. '2019-07-02T22:06:24.342342+00:00')
         :param t_end: (str) time in ISO8601 format (e.g. '2019-07-03T22:06:24.234213+00:00'
+        :param platform: possible values -> ('browser', 'api', 'margin')
         :return: list[dict[str,]]
             Example:
                 [{'buy_price': 293.1, 'error': None, 'fx_quote_id': 'e2e1758f1a094a2a85825b592e9fc0d9',
-                'is_filled': True, 'price_executed': 293.1, 'quantity_requested': {'token': 'ETH', 'value': '0.10000'},
+                'is_filled': True, 'price_executed': 293.1, 'platform': 'browser', 'quantity_requested': {'token': 'ETH', 'value': '0.10000'},
                 'sell_price': 293.03, 'side_executed': 'buy', 'side_requested': 'two_way', 'status': 'success',
                 't_execute': '2019-07-03T14:02:56.539710+00:00', 't_expiry': '2019-07-03T14:03:02.038093+00:00',
                 't_quote': '2019-07-03T14:02:52.038087+00:00',
-                'token_pair': {'base_token': 'ETH', 'quote_token': 'USD'}},
+                'token_pair': {'base_token': 'ETH', 'quote_token': 'USD'}, 'trader_email': 'trader1@company.com'},
 
                 {'buy_price': 293.1, 'error': None, 'fx_quote_id': 'fc17a0d884444a0db5a7d9568c6c3f70',
-                'is_filled': True, 'price_executed': 293.03, 'quantity_requested': {'token': 'ETH', 'value': '0.10000'},
+                'is_filled': True, 'price_executed': 293.03, 'platform': 'api', 'quantity_requested': {'token': 'ETH', 'value': '0.10000'},
                 'sell_price': 293.03, 'side_executed': 'sell', 'side_requested': 'two_way', 'status': 'success',
                 't_execute': '2019-07-03T14:02:46.480337+00:00', 't_expiry': '2019-07-03T14:02:50.454222+00:00',
-                't_quote': '2019-07-03T14:02:40.454217+00:00', 'token_pair': {'base_token': 'ETH', 'quote_token': 'USD'}}]
+                't_quote': '2019-07-03T14:02:40.454217+00:00', 'token_pair': {'base_token': 'ETH', 'quote_token': 'USD'},
+                'trader_email': 'trader2@company.com'}]
 
         """
         if not self.auth:
             raise Exception("Authentication is required for this API call")
 
-        params = {'t_start': t_start, 't_end': t_end}
+        params = {'t_start': t_start, 't_end': t_end, 'platform': platform}
         return self._process_response(requests.get(self.url + 'quotes', params=params, auth=self.auth))
 
     def get_balances(self, platform=None):
         """
         Get account balances.
-        :param platform: possible values -> ('midas', 'api', 'margin')
+        :param platform: possible values -> ('browser', 'api', 'margin')
         :return: list[dict[str, float]]
             Example:
                 [
-                    {'balance': 0.0, 'token': 'BTC'},
-                    {'balance': -1.3772005993291505, 'token': 'ETH'},
-                    {'balance': 187.624207, 'token': 'USD'}
+                    {'balance': 0.0, 'token': 'BTC', 'platform': 'browser'},
+                    {'balance': -1.3772005993291505, 'token': 'ETH', 'platform': 'api'},
+                    {'balance': 187.624207, 'token': 'USD', 'platform': 'api'}
                 ]
         """
         if not self.auth:
@@ -210,7 +214,7 @@ class FalconxClient:
 
         :param t_start: (str) time in ISO8601 format (e.g. '2019-07-02T22:06:24.342342+00:00')
         :param t_end: (str) time in ISO8601 format (e.g. '2019-07-03T22:06:24.234213+00:00'
-        :param platform: possible values -> ('midas', 'api', 'margin')
+        :param platform: possible values -> ('browser', 'api', 'margin')
         :return: list[dict[str,]]
             Example:
                 [
