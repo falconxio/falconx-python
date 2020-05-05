@@ -241,6 +241,51 @@ class FalconxClient:
         params = {'t_start': t_start, 't_end': t_end, 'platform': platform}
         return self._process_response(requests.get(self.url + 'transfers', params=params, auth=self.auth))
 
+    def get_trade_volume(self, t_start, t_end):
+        if not self.auth:
+            raise Exception("Authentication is required for this API call")
+
+        params = {'t_start': t_start, 't_end': t_end}
+        return self._process_response(requests.get(self.url + 'get_trade_volume', params=params, auth=self.auth))
+
+    def get_30_day_trailing_volume(self):
+        response = requests.get(self.url + 'get_30_day_trailing_volume', auth=self.auth)
+        return self._process_response(response)
+
+    def get_trade_limits(self, platform):
+        if not self.auth:
+            raise Exception("Authentication is required for this API call")
+
+        return self._process_response(requests.get(self.url + 'get_trade_limits/{}'.format(platform), auth=self.auth))
+
+    def submit_withdrawal_request(self, token, amount, platform):
+        if not self.auth:
+            raise Exception("Authentication is required for this API call")
+
+        params = {'token': token, 'amount': amount, 'platform': platform}
+        return self._process_response(requests.post(self.url + 'withdraw', params=params, auth=self.auth))
+
+    def get_rate_limits(self):
+        if not self.auth:
+            raise Exception("Authentication is required for this API call")
+
+        response = requests.get(self.url + 'rate_limit', auth=self.auth)
+        return self._process_response(response)
+
+    def get_trade_sizes(self):
+        if not self.auth:
+            raise Exception("Authentication is required for this API call")
+
+        response = requests.get(self.url + 'trade_sizes', auth=self.auth)
+        return self._process_response(response)
+
+    def get_total_balances(self):
+        if not self.auth:
+            raise Exception("Authentication is required for this API call")
+
+        response = requests.get(self.url + 'balances/total', auth=self.auth)
+        return self._process_response(response)
+
 
 # Authentication class for requests library
 class FXRfqAuth(AuthBase):
