@@ -14,7 +14,7 @@ pip install falconx
 from falconx import FalconxClient
 
 client = FalconxClient(key=KEY, secret=SECRET, passphrase=PASSPHRASE)
-quote = client.get_quote('BTC', 'USD', 5, 'two-way')
+quote = client.get_quote('BTC', 'USD', 5, 'two_way')
 result = client.execute_quote(quote['fx_quote_id'], 'buy')
 ```
 
