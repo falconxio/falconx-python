@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
      name='falconx',
-     version='1.0.3',
+     version='1.0.4',
      author="FalconX",
      author_email="support@falconx.io",
      description="The official client for FalconX APIs",

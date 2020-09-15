@@ -23,6 +23,8 @@ class FalconxClient:
             self.auth = FXRfqAuth(key, secret, passphrase)
         else:
             raise Exception('key, secret and passphrase are necessary for authentication')
+        self.session = requests.Session()
+        self.session.auth = self.auth
 
     def _process_response(self, response: Response):
         if response.status_code == 200:
@@ -36,10 +38,10 @@ class FalconxClient:
         :return: (list[dict])
             Example: [{'base_token': 'BTC', 'quote_token': 'USD'}, {'base_token': 'ETH', 'quote_token': 'USD'}]
         """
-        response = requests.get(self.url + 'pairs', auth=self.auth)
+        response = self.session.get(self.url + 'pairs')
         return self._process_response(response)
 
-    def get_quote(self, base, quote, quantity, side):
+    def get_quote(self, base, quote, quantity, side, client_order_id=None):
         """
         Get a two_way, buy or sell quote for a token pair.
         :param base: (str) base token e.g. BTC, ETH
@@ -67,7 +69,8 @@ class FalconxClient:
               "is_filled": false,
               "side_executed": null,
               "price_executed": null,
-              "t_execute": null
+              "t_execute": null,
+              "client_order_id": "d6f3e1fa-e148-4009-9c07-a87f9ae78d1a"
             }
         """
 
@@ -83,10 +86,81 @@ class FalconxClient:
                 'token': base,
                 'value': str(quantity)
             },
-            'side': side
+            'side': side,
+            "client_order_id": client_order_id
         }
 
-        response = requests.post(self.url + 'quotes', json=params, auth=self.auth)
+        response = self.session.post(self.url + 'quotes', json=params)
+        return self._process_response(response)
+
+    def place_order(self, base, quote, quantity, side, order_type, time_in_force=None, limit_price=None, slippage_bps=None, client_order_id=None):
+        """
+        Get a two_way, buy or sell quote for a token pair.
+        :param base: (str) base token e.g. BTC, ETH
+        :param quote: (str) quote token e.g. USD, BTC
+        :param quantity: (float, Decimal)
+        :param side: (str) 'buy', 'sell'
+        :param order_type: (str) 'market', 'limit'
+        :param time_in_force: (str) 'fok' [only required for limit orders]
+        :param limit_price: (float, Decimal) [only required for limit orders]
+        :param slippage_bps: (float, Decimal) [only valid for fok limit orders]
+        :return: (dict) Example:
+            {
+                "status": "success",
+                "fx_quote_id": "00c884b056f949338788dfb59e495377",
+                "buy_price": 8545.12,
+                "sell_price": null,
+                "platform": "api",
+                "token_pair": {
+                    "base_token": "BTC",
+                    "quote_token": "USD"
+                },
+                "quantity_requested": {
+                    "token": "BTC",
+                    "value": "10"
+                },
+                "side_requested": "buy",
+                "t_quote": "2019-06-27T11:59:21.875725+00:00",
+                "t_expiry": "2019-06-27T11:59:22.875725+00:00",
+                "is_filled": true,
+                "gross_fee_bps": 8,
+                "gross_fee_usd": 101.20,
+                "rebate_bps": 3,
+                "rebate_usd": 37.95,
+                "fee_bps": 5,
+                "fee_usd": 63.25,
+                "side_executed": "buy",
+                "trader_email": "trader@company.com",
+                "order_type": "limit",
+                "time_in_force": "fok",
+                "limit_price": 8547.11,
+                "slippage_bps": 2,
+                "error": null,
+                "client_order_id": "d6f3e1fa-e148-4009-9c07-a87f9ae78d1a"
+            }
+        """
+
+        if not self.auth:
+            raise Exception("Authentication is required for this API call")
+
+        params = {
+            'token_pair': {
+                'base_token': base,
+                'quote_token': quote
+            },
+            'quantity': {
+                'token': base,
+                'value': str(quantity)
+            },
+            'side': side,
+            'order_type': order_type,
+            'time_in_force': time_in_force,
+            'limit_price': limit_price,
+            'slippage_bps': slippage_bps,
+            "client_order_id": client_order_id
+        }
+
+        response = self.session.post(self.url + 'order', json=params)
         return self._process_response(response)
 
     def execute_quote(self, fx_quote_id, side):
@@ -123,7 +197,7 @@ class FalconxClient:
             'side': side
         }
 
-        response = requests.post(self.url + 'quotes/execute', json=params, auth=self.auth)
+        response = self.session.post(self.url + 'quotes/execute', json=params, auth=self.auth)
         return self._process_response(response)
 
     def get_quote_status(self, fx_quote_id):
@@ -160,7 +234,7 @@ class FalconxClient:
         if not self.auth:
             raise Exception("Authentication is required for this API call")
 
-        return self._process_response(requests.get(self.url + 'quotes/{}'.format(fx_quote_id), auth=self.auth))
+        return self._process_response(self.session.get(self.url + 'quotes/{}'.format(fx_quote_id)))
 
     def get_executed_quotes(self, t_start, t_end, platform=None):
         """
@@ -189,7 +263,7 @@ class FalconxClient:
             raise Exception("Authentication is required for this API call")
 
         params = {'t_start': t_start, 't_end': t_end, 'platform': platform}
-        return self._process_response(requests.get(self.url + 'quotes', params=params, auth=self.auth))
+        return self._process_response(self.session.get(self.url + 'quotes', params=params))
 
     def get_balances(self, platform=None):
         """
@@ -206,7 +280,7 @@ class FalconxClient:
         if not self.auth:
             raise Exception("Authentication is required for this API call")
 
-        return self._process_response(requests.get(self.url + 'balances', params={'platform': platform}, auth=self.auth))
+        return self._process_response(self.session.get(self.url + 'balances', params={'platform': platform}))
 
     def get_transfers(self, t_start=None, t_end=None, platform=None):
         """
@@ -239,51 +313,51 @@ class FalconxClient:
             raise Exception("Authentication is required for this API call")
 
         params = {'t_start': t_start, 't_end': t_end, 'platform': platform}
-        return self._process_response(requests.get(self.url + 'transfers', params=params, auth=self.auth))
+        return self._process_response(self.session.get(self.url + 'transfers', params=params))
 
     def get_trade_volume(self, t_start, t_end):
         if not self.auth:
             raise Exception("Authentication is required for this API call")
 
         params = {'t_start': t_start, 't_end': t_end}
-        return self._process_response(requests.get(self.url + 'get_trade_volume', params=params, auth=self.auth))
+        return self._process_response(self.session.get(self.url + 'get_trade_volume', params=params))
 
     def get_30_day_trailing_volume(self):
-        response = requests.get(self.url + 'get_30_day_trailing_volume', auth=self.auth)
+        response = self.session.get(self.url + 'get_30_day_trailing_volume')
         return self._process_response(response)
 
     def get_trade_limits(self, platform):
         if not self.auth:
             raise Exception("Authentication is required for this API call")
 
-        return self._process_response(requests.get(self.url + 'get_trade_limits/{}'.format(platform), auth=self.auth))
+        return self._process_response(self.session.get(self.url + 'get_trade_limits/{}'.format(platform)))
 
     def submit_withdrawal_request(self, token, amount, platform):
         if not self.auth:
             raise Exception("Authentication is required for this API call")
 
         params = {'token': token, 'amount': amount, 'platform': platform}
-        return self._process_response(requests.post(self.url + 'withdraw', params=params, auth=self.auth))
+        return self._process_response(self.session.post(self.url + 'withdraw', params=params))
 
     def get_rate_limits(self):
         if not self.auth:
             raise Exception("Authentication is required for this API call")
 
-        response = requests.get(self.url + 'rate_limit', auth=self.auth)
+        response = self.session.get(self.url + 'rate_limit')
         return self._process_response(response)
 
     def get_trade_sizes(self):
         if not self.auth:
             raise Exception("Authentication is required for this API call")
 
-        response = requests.get(self.url + 'trade_sizes', auth=self.auth)
+        response = self.session.get(self.url + 'trade_sizes')
         return self._process_response(response)
 
     def get_total_balances(self):
         if not self.auth:
             raise Exception("Authentication is required for this API call")
 
-        response = requests.get(self.url + 'balances/total', auth=self.auth)
+        response = self.session.get(self.url + 'balances/total')
         return self._process_response(response)
 
 
