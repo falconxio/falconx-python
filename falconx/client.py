@@ -360,7 +360,7 @@ class FalconxClient:
         response = self.session.get(self.url + 'balances/total')
         return self._process_response(response)
 
-    def get_derivatives(self, **kwargs):
+    def get_derivatives(self, trade_status=None, product_type=None, market_list=None):
         """Get all derivative trade data with current mark-to-market data.
 
         Args:
@@ -398,8 +398,11 @@ class FalconxClient:
         if not self.auth:
             raise Exception('Authentication is required for this API call')
 
-        valid_params = ('trade_status', 'product_type', 'market_list')
-        params = {param: value for param, value in kwargs.items() if param in valid_params}
+        params = {
+            'trade_status': trade_status,
+            'product_type': product_type,
+            'market_list': market_list,
+        }
 
         return self._process_response(self.session.get(self.url + 'derivatives', params=params))
 
