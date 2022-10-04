@@ -361,7 +361,8 @@ class FalconxClient:
         return self._process_response(response)
 
     def get_derivatives(self, trade_status=None, product_type=None, market_list=None):
-        """Get all derivative trade data with current mark-to-market data.
+        """
+        Get all derivative trade data with current mark-to-market data.
 
         Args:
             trade_status: possible values -> ('open', 'closed', 'settled', 'defaulted')
