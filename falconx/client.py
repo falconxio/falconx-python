@@ -396,7 +396,7 @@ class FalconxClient:
             }
         """
         if not self.auth:
-            raise Exception("Authentication is required for this API call")
+            raise Exception('Authentication is required for this API call')
 
         valid_params = ('trade_status', 'product_type', 'market_list')
         params = {param: value for param, value in kwargs.items() if param in valid_params}
