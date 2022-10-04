@@ -376,7 +376,7 @@ class FalconxClient:
                     'Trade ID': '12a29e52cfe745c4a4ee556f372ebce2',
                     'Status': 'open',
                     'Market': 'ETH - USD',
-                    'Customer Trader': 'will@client.com',
+                    'Trader': 'will@client.com',
                     'Product': 'OPTION',
                     'Quantity': 500,
                     'Side': 'Sell',
