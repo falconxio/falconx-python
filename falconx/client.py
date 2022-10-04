@@ -369,6 +369,31 @@ class FalconxClient:
             market_list: comma separated list, e.g. 'BTC-USD,ETH-USD'
         Return:
             list[dict]
+            # Example Response =>
+            {
+                success: True,
+                response: [{
+                    'Trade ID': '12a29e52cfe745c4a4ee556f372ebce2',
+                    'Status': 'open',
+                    'Market': 'ETH - USD',
+                    'Customer Trader': 'will@client.com',
+                    'Product': 'OPTION',
+                    'Quantity': 500,
+                    'Side': 'Sell',
+                    'Type': 'Put',
+                    'Trade Date': '09/08/2022 1:56 PM ET',
+                    'Effective Date': '09/12/2022',
+                    'Maturity Date': '11/18/2022',
+                    'Fixing / Expiry Time': '4pm NYC',
+                    'Premium': '100,000.00 USD',
+                    'Counterparty Margin': '15.00001% USD',
+                    'Trade Notional': '800,000.00 USD',
+                    'Strike Price': '2,000.00 USD',
+                    'Daily Mark': '-2.00 USD',
+                    'Delta': '-262.00',
+                    'Vega': '-272.00 USD',
+                }]
+            }
         """
         if not self.auth:
             raise Exception("Authentication is required for this API call")
