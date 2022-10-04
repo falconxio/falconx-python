@@ -360,6 +360,23 @@ class FalconxClient:
         response = self.session.get(self.url + 'balances/total')
         return self._process_response(response)
 
+    def get_derivatives(self, **kwargs):
+        """Get all derivative trade data with current mark-to-market data.
+
+        Args:
+            trade_status: possible values -> ('open', 'closed', 'settled', 'defaulted')
+            product_type: possible values -> ('ndf', 'call_option', 'put_option', 'irs', 'option')
+            market_list: comma separated list, e.g. 'BTC-USD,ETH-USD'
+        Return:
+            list[dict]
+        """
+        if not self.auth:
+            raise Exception("Authentication is required for this API call")
+
+        valid_params = ('trade_status', 'product_type', 'market_list')
+        params = {param: value for param, value in kwargs.items() if param in valid_params}
+
+        return self._process_response(self.session.get(self.url + 'derivatives', params=params))
 
 # Authentication class for requests library
 class FXRfqAuth(AuthBase):
