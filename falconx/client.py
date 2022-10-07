@@ -360,6 +360,52 @@ class FalconxClient:
         response = self.session.get(self.url + 'balances/total')
         return self._process_response(response)
 
+    def get_derivatives(self, trade_status=None, product_type=None, market_list=None):
+        """
+        Get all derivative trade data with current mark-to-market data.
+
+        Args:
+            trade_status: possible values -> ('open', 'closed', 'settled', 'defaulted')
+            product_type: possible values -> ('ndf', 'call_option', 'put_option', 'irs', 'option')
+            market_list: comma separated list, e.g. 'BTC-USD,ETH-USD'
+        Return:
+            list[dict]
+            # Example Response =>
+            {
+                success: True,
+                response: [{
+                    'Trade ID': '12a29e52cfe745c4a4ee556f372ebce2',
+                    'Status': 'open',
+                    'Market': 'ETH - USD',
+                    'Trader': 'will@client.com',
+                    'Product': 'OPTION',
+                    'Quantity': 500,
+                    'Side': 'Sell',
+                    'Type': 'Put',
+                    'Trade Date': '09/08/2022 1:56 PM ET',
+                    'Effective Date': '09/12/2022',
+                    'Maturity Date': '11/18/2022',
+                    'Fixing / Expiry Time': '4pm NYC',
+                    'Premium': '100,000.00 USD',
+                    'Counterparty Margin': '15.00001% USD',
+                    'Trade Notional': '800,000.00 USD',
+                    'Strike Price': '2,000.00 USD',
+                    'Daily Mark': '-2.00 USD',
+                    'Delta': '-262.00',
+                    'Vega': '-272.00 USD',
+                }]
+            }
+        """
+        if not self.auth:
+            raise Exception('Authentication is required for this API call')
+
+        params = {
+            'trade_status': trade_status,
+            'product_type': product_type,
+            'market_list': market_list,
+        }
+
+        return self._process_response(self.session.get(self.url + 'derivatives', params=params))
 
 # Authentication class for requests library
 class FXRfqAuth(AuthBase):
