@@ -442,6 +442,7 @@ class FalconxClient:
 
         return self._process_response(self.session.get(self.url + 'derivatives/margins'))
 
+
 # Authentication class for requests library
 class FXRfqAuth(AuthBase):
     def __init__(self, api_key, secret_key, passphrase):
