@@ -395,6 +395,11 @@ class FalconxClient:
                     'Vega': '-272.00 USD',
                 }]
             }
+            # On failure:
+            {
+                "code": "INTERNAL_ERROR",
+                "reason": "Please try again or reach out to the FalconX team for a speedy resolution."
+            }
         """
         if not self.auth:
             raise Exception('Authentication is required for this API call')
@@ -409,10 +414,10 @@ class FalconxClient:
 
     def get_derivatives_margin(self):
         """
-        Get total margin per token in derivative balances.
+        Get total margin for each token in derivative balances.
 
-        Returns:
-            JSON of format:
+        Returns: JSON
+            # Example Response =>
             {
                 "response": [
                     {
@@ -424,6 +429,12 @@ class FalconxClient:
                     }
                 ],
                 "success": True (boolean)
+            }
+
+            # On failure:
+            {
+                "code": "INTERNAL_ERROR",
+                "reason": "Please try again or reach out to the FalconX team for a speedy resolution."
             }
         """
         if not self.auth:
