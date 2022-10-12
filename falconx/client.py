@@ -395,11 +395,6 @@ class FalconxClient:
                     'Vega': '-272.00 USD',
                 }]
             }
-            # On failure:
-            {
-                "code": "INTERNAL_ERROR",
-                "reason": "Please try again or reach out to the FalconX team for a speedy resolution."
-            }
         """
         if not self.auth:
             raise Exception('Authentication is required for this API call')
@@ -429,12 +424,6 @@ class FalconxClient:
                     }
                 ],
                 "success": True (boolean)
-            }
-
-            # On failure:
-            {
-                "code": "INTERNAL_ERROR",
-                "reason": "Please try again or reach out to the FalconX team for a speedy resolution."
             }
         """
         if not self.auth:
