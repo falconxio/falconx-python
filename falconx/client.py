@@ -407,6 +407,31 @@ class FalconxClient:
 
         return self._process_response(self.session.get(self.url + 'derivatives', params=params))
 
+    def get_derivatives_margin(self):
+        """
+        Get total margin for each token in derivative balances.
+
+        Returns: JSON
+            # Example Response =>
+            {
+                "response": [
+                    {
+                        “token”: “BTC” (string),
+                        “total_margin”: 10.1 (float)
+                    }, {
+                        “token”: “ETH”, (string)
+                        “total_margin”: 32.31 (float)
+                    }
+                ],
+                "success": True (boolean)
+            }
+        """
+        if not self.auth:
+            raise Exception('Authentication is required for this API call')
+
+        return self._process_response(self.session.get(self.url + 'derivatives/margins'))
+
+
 # Authentication class for requests library
 class FXRfqAuth(AuthBase):
     def __init__(self, api_key, secret_key, passphrase):
