@@ -368,12 +368,10 @@ class FalconxClient:
             trade_status: possible values -> ('open', 'closed', 'settled', 'defaulted')
             product_type: possible values -> ('ndf', 'call_option', 'put_option', 'irs', 'option')
             market_list: comma separated list, e.g. 'BTC-USD,ETH-USD'
-        Return:
-            list[dict]
+        Returns: JSON
             # Example Response =>
             {
-                success: True,
-                response: [{
+                "response": [{
                     "trade_id": "12a29e52cfe745c4a4ee556f372ebce2",
                     "status": "open",
                     "market": "ETH - USD",
@@ -394,6 +392,7 @@ class FalconxClient:
                     "delta": "-262.00",
                     "vega": "-272.00 USD"
                 }]
+                "success": True,
             }
         """
         if not self.auth:
