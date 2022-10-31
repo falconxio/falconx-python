@@ -368,8 +368,7 @@ class FalconxClient:
             trade_status: possible values -> ('open', 'closed', 'settled', 'defaulted')
             product_type: possible values -> ('ndf', 'call_option', 'put_option', 'irs', 'option')
             market_list: comma separated list, e.g. 'BTC-USD,ETH-USD'
-        Return:
-            list[dict]
+        Returns: JSON
             # Example Response =>
             [
                 {
@@ -428,6 +427,28 @@ class FalconxClient:
         }
 
         return self._process_response(self.session.get(self.url + 'derivatives', params=params))
+
+    def get_derivatives_margin(self):
+        """
+        Get total margin for each token in derivative balances.
+
+        Returns: JSON
+            # Example Response =>
+            [
+                {
+                    “token”: “BTC” (string),
+                    “total_margin”: 10.1 (float)
+                }, {
+                    “token”: “ETH”, (string)
+                    “total_margin”: 32.31 (float)
+                }
+            ]
+        """
+        if not self.auth:
+            raise Exception('Authentication is required for this API call')
+
+        return self._process_response(self.session.get(self.url + 'derivatives/margins'))
+
 
 # Authentication class for requests library
 class FXRfqAuth(AuthBase):
