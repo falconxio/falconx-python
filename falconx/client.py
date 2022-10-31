@@ -371,30 +371,52 @@ class FalconxClient:
         Return:
             list[dict]
             # Example Response =>
-            {
-                success: True,
-                response: [{
-                    'Trade ID': '12a29e52cfe745c4a4ee556f372ebce2',
-                    'Status': 'open',
-                    'Market': 'ETH - USD',
-                    'Trader': 'will@client.com',
-                    'Product': 'OPTION',
-                    'Quantity': 500,
-                    'Side': 'Sell',
-                    'Type': 'Put',
-                    'Trade Date': '09/08/2022 1:56 PM ET',
-                    'Effective Date': '09/12/2022',
-                    'Maturity Date': '11/18/2022',
-                    'Fixing / Expiry Time': '4pm NYC',
-                    'Premium': '100,000.00 USD',
-                    'Counterparty Margin': '15.00001% USD',
-                    'Trade Notional': '800,000.00 USD',
-                    'Strike Price': '2,000.00 USD',
-                    'Daily Mark': '-2.00 USD',
-                    'Delta': '-262.00',
-                    'Vega': '-272.00 USD',
-                }]
-            }
+            [
+                {
+                    "counterparty_margin_percent": {
+                        "value": 15.0,
+                        "token": "USD"
+                    },
+                    "daily_mark": {
+                        "value": -2.0,
+                        "token": "USD"
+                    },
+                    "delta": -262.0,
+                    "effective_date": null,
+                    "fixing_expiry_time": "4pm NYC",
+                    "market": "BTC/USD",
+                    "maturity_date": "2022-02-26T00:00:00+00:00",
+                    "option_type": "put",
+                    "premium": {
+                        "token": "USD",
+                        "value": 100000.00
+                    },
+                    "product": "option",
+                    "quantity": 100.0,
+                    "side": "sell",
+                    "status": "open",
+                    "spot_reference_price": {
+                        "token": "USD",
+                        "value": 20010.0
+                    },
+                    "strike_price": {
+                        "token": "USD",
+                        "value": 20000.0
+                    },
+                    "trade_date": "2022-02-26T00:03:00+00:00",
+                    "trade_id": "13db3a3f832e444a90435e900d1c3222",
+                    "trade_notional": {
+                        "token": "USD",
+                        "value": 2001000.0
+                    },
+                    "trader": "william@client.co",
+                    "trading_entity": "solios",
+                    "vega": {
+                        "value": -272.0
+                        "token": "USD"
+                    }
+                }
+            ]
         """
         if not self.auth:
             raise Exception('Authentication is required for this API call')
