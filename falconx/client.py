@@ -365,9 +365,9 @@ class FalconxClient:
         Get all derivative trade data with current mark-to-market data.
 
         Args:
-            trade_status: possible values -> ('open', 'closed', 'settled', 'defaulted')
+            trade_status: possible values -> ('open', 'terminated', 'settled', 'defaulted')
             product_type: possible values -> ('ndf', 'call_option', 'put_option', 'irs', 'option')
-            market_list: comma separated list, e.g. 'BTC-USD,ETH-USD'
+            market_list: string with comma separated list of token pairs, e.g. 'BTC-USD,ETH-USD'
         Returns: JSON
             # Example Response =>
             [
@@ -383,7 +383,6 @@ class FalconxClient:
                     "delta": -262.0,
                     "effective_date": null,
                     "fixing_expiry_time": "4pm NYC",
-                    "market": "BTC/USD",
                     "maturity_date": "2022-02-26T00:00:00+00:00",
                     "option_type": "put",
                     "premium": {
@@ -401,6 +400,10 @@ class FalconxClient:
                     "strike_price": {
                         "token": "USD",
                         "value": 20000.0
+                    },
+                    "token_pair": {
+                        "base_token": "BTC",
+                        "quote_token": "USD"
                     },
                     "trade_date": "2022-02-26T00:03:00+00:00",
                     "trade_id": "13db3a3f832e444a90435e900d1c3222",
@@ -436,11 +439,11 @@ class FalconxClient:
             # Example Response =>
             [
                 {
-                    “token”: “BTC” (string),
-                    “total_margin”: 10.1 (float)
+                    "token": "BTC"
+                    “total_margin": 10.1
                 }, {
-                    “token”: “ETH”, (string)
-                    “total_margin”: 32.31 (float)
+                    "token": “ETH",
+                    "total_margin": 32.31
                 }
             ]
         """
