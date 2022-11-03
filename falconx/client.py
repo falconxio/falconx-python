@@ -365,35 +365,60 @@ class FalconxClient:
         Get all derivative trade data with current mark-to-market data.
 
         Args:
-            trade_status: possible values -> ('open', 'closed', 'settled', 'defaulted')
+            trade_status: possible values -> ('open', 'terminated', 'settled', 'defaulted')
             product_type: possible values -> ('ndf', 'call_option', 'put_option', 'irs', 'option')
-            market_list: comma separated list, e.g. 'BTC-USD,ETH-USD'
+            market_list: string with comma separated list of token pairs, e.g. 'BTC-USD,ETH-USD'
         Returns: JSON
             # Example Response =>
-            {
-                "response": [{
-                    "trade_id": "12a29e52cfe745c4a4ee556f372ebce2",
-                    "status": "open",
-                    "market": "ETH - USD",
-                    "trader": "will@client.com",
-                    "product": "OPTION",
-                    "quantity": 500,
-                    "side": "Sell",
-                    "type": "Put",
-                    "trade_date": "09/08/2022 1:56 PM ET",
-                    "effective_date": "09/12/2022",
-                    "maturity_date": "11/18/2022",
+            [
+                {
+                    "counterparty_margin_percent": {
+                        "value": 15.0,
+                        "token": "USD"
+                    },
+                    "daily_mark": {
+                        "value": -2.0,
+                        "token": "USD"
+                    },
+                    "delta": -262.0,
+                    "effective_date": null,
                     "fixing_expiry_time": "4pm NYC",
-                    "premium": "100,000.00 USD",
-                    "counterparty_margin": "15.00001% USD",
-                    "trade_notional": "800,000.00 USD",
-                    "strike_price": "2,000.00 USD",
-                    "daily_mark": "-2.00 USD",
-                    "delta": "-262.00",
-                    "vega": "-272.00 USD"
-                }]
-                "success": True,
-            }
+                    "maturity_date": "2022-02-26T00:00:00+00:00",
+                    "option_type": "put",
+                    "premium": {
+                        "token": "USD",
+                        "value": 100000.00
+                    },
+                    "product": "option",
+                    "quantity": 100.0,
+                    "side": "sell",
+                    "status": "open",
+                    "spot_reference_price": {
+                        "token": "USD",
+                        "value": 20010.0
+                    },
+                    "strike_price": {
+                        "token": "USD",
+                        "value": 20000.0
+                    },
+                    "token_pair": {
+                        "base_token": "BTC",
+                        "quote_token": "USD"
+                    },
+                    "trade_date": "2022-02-26T00:03:00+00:00",
+                    "trade_id": "13db3a3f832e444a90435e900d1c3222",
+                    "trade_notional": {
+                        "token": "USD",
+                        "value": 2001000.0
+                    },
+                    "trader": "william@client.com",
+                    "trading_entity": "solios",
+                    "vega": {
+                        "value": -272.0
+                        "token": "USD"
+                    }
+                }
+            ]
         """
         if not self.auth:
             raise Exception('Authentication is required for this API call')
@@ -412,18 +437,15 @@ class FalconxClient:
 
         Returns: JSON
             # Example Response =>
-            {
-                "response": [
-                    {
-                        “token”: “BTC” (string),
-                        “total_margin”: 10.1 (float)
-                    }, {
-                        “token”: “ETH”, (string)
-                        “total_margin”: 32.31 (float)
-                    }
-                ],
-                "success": True (boolean)
-            }
+            [
+                {
+                    "token": "BTC"
+                    “total_margin": 10.1
+                }, {
+                    "token": “ETH",
+                    "total_margin": 32.31
+                }
+            ]
         """
         if not self.auth:
             raise Exception('Authentication is required for this API call')
