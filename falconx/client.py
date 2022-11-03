@@ -411,7 +411,7 @@ class FalconxClient:
                         "token": "USD",
                         "value": 2001000.0
                     },
-                    "trader": "william@client.co",
+                    "trader": "william@client.com",
                     "trading_entity": "solios",
                     "vega": {
                         "value": -272.0
