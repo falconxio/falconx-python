@@ -19,6 +19,7 @@ class FalconxClient:
                  passphrase=None,
                  url='https://api.falconx.io/v1/'):
         self.url = url
+        self.v3_url = 'https://api.falconx.io/v3/'
         if key and secret and passphrase:
             self.auth = FXRfqAuth(key, secret, passphrase)
         else:
@@ -93,7 +94,7 @@ class FalconxClient:
         response = self.session.post(self.url + 'quotes', json=params)
         return self._process_response(response)
 
-    def place_order(self, base, quote, quantity, side, order_type, time_in_force=None, limit_price=None, slippage_bps=None, client_order_id=None):
+    def place_order(self, base, quote, quantity, side, order_type, time_in_force=None, limit_price=None, slippage_bps=None, client_order_id=None, v3 = True):
         """
         Get a two_way, buy or sell quote for a token pair.
         :param base: (str) base token e.g. BTC, ETH
@@ -160,7 +161,8 @@ class FalconxClient:
             "client_order_id": client_order_id
         }
 
-        response = self.session.post(self.url + 'order', json=params)
+        order_url = self.v3_url if v3 else self.url
+        response = self.session.post(order_url + 'order', json=params)
         return self._process_response(response)
 
     def execute_quote(self, fx_quote_id, side):
