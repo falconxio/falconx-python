@@ -23,7 +23,6 @@ class FalconxClient:
                  url=HOST):
         self.url = url + 'v1/'
         self.v3_url = url + 'v3/'
-        print('self.v3_url is: ',self.v3_url)
         if key and secret and passphrase:
             self.auth = FXRfqAuth(key, secret, passphrase)
         else:
