@@ -45,13 +45,14 @@ class FalconxClient:
         response = self.session.get(self.url + 'pairs')
         return self._process_response(response)
 
-    def get_quote(self, base, quote, quantity, side, client_order_id=None):
+    def get_quote(self, base, quote, quantity, side, client_order_id=None, is_quote_token_quantity=False):
         """
         Get a two_way, buy or sell quote for a token pair.
         :param base: (str) base token e.g. BTC, ETH
         :param quote: (str) quote token e.g. USD, BTC
         :param quantity: (float, Decimal)
         :param side: (str) 'two_way', 'buy', 'sell'
+        :param is_quote_token_quantity: (bool) mark this as True if the quantity provided is in quote token terms
         :return: (dict) Example:
             {
               "status": "success",
@@ -87,7 +88,7 @@ class FalconxClient:
                 'quote_token': quote
             },
             'quantity': {
-                'token': base,
+                'token': quote if is_quote_token_quantity else base,
                 'value': str(quantity)
             },
             'side': side,
