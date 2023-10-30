@@ -18,6 +18,11 @@ quote = client.get_quote('BTC', 'USD', 5, 'two_way')
 result = client.execute_quote(quote['fx_quote_id'], 'buy')
 ```
 
+## RFQ in quote token terms
+```python
+quote = client.get_quote('BTC', 'USD', 5, 'two_way', is_quote_token_quantity=True)
+```
+
 ## New Order Endpoint
 A new faster endpoint is now available to place orders.
 The same can be used as mentioned in the below sample.
