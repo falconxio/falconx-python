@@ -103,12 +103,12 @@ class FalconxClient:
         Get a two_way, buy or sell quote for a token pair.
         :param base: (str) base token e.g. BTC, ETH
         :param quote: (str) quote token e.g. USD, BTC
-        :param quantity: (float, Decimal)
+        :param quantity: (float, Decimal). For v3 order, send float
         :param side: (str) 'buy', 'sell'
         :param order_type: (str) 'market', 'limit'
         :param time_in_force: (str) 'fok' [only required for limit orders]
-        :param limit_price: (float, Decimal) [only required for limit orders]
-        :param slippage_bps: (float, Decimal) [only valid for fok limit orders]
+        :param limit_price: (float, Decimal) [only required for limit orders]. For v3 order, send float
+        :param slippage_bps: (float, Decimal) [only valid for fok limit orders] For v3 order, send float
         :return: (dict) Example:
             {
                 "status": "success",
@@ -155,7 +155,7 @@ class FalconxClient:
             },
             'quantity': {
                 'token': base,
-                'value': Decimal(quantity) if v3 else str(quantity)
+                'value': quantity if v3 else str(quantity)
             },
             'side': side,
             'order_type': order_type,
