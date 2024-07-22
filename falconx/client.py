@@ -98,7 +98,7 @@ class FalconxClient:
         response = self.session.post(self.url + 'quotes', json=params)
         return self._process_response(response)
 
-    def place_order(self, base, quote, quantity, side, order_type, time_in_force=None, limit_price=None, slippage_bps=None, client_order_id=None, v3 = False):
+    def place_order(self, base, quote, quantity, side, order_type, time_in_force=None, limit_price=None, slippage_bps=None, client_order_id=None, v3 = False, client_order_uuid=None):
         """
         Get a two_way, buy or sell quote for a token pair.
         :param base: (str) base token e.g. BTC, ETH
@@ -141,7 +141,8 @@ class FalconxClient:
                 "limit_price": 8547.11,
                 "slippage_bps": 2,
                 "error": null,
-                "client_order_id": "d6f3e1fa-e148-4009-9c07-a87f9ae78d1a"
+                "client_order_id": "d6f3e1fa-e148-4009-9c07-a87f9ae78d1a",
+                "client_order_uuid": "449886ed1461467c8489c58b3d22381c"
             }
         """
 
@@ -164,6 +165,8 @@ class FalconxClient:
             'slippage_bps': slippage_bps,
             "client_order_id": client_order_id
         }
+        if client_order_uuid:
+            params['client_order_uuid'] = client_order_uuid
 
         order_url = self.v3_url if v3 else self.url
         response = self.session.post(order_url + 'order', json=params)
