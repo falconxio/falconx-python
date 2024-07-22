@@ -98,7 +98,7 @@ class FalconxClient:
         response = self.session.post(self.url + 'quotes', json=params)
         return self._process_response(response)
 
-    def place_order(self, base, quote, quantity, side, order_type, time_in_force=None, limit_price=None, slippage_bps=None, client_order_id=None, client_order_uuid=None, v3 = False):
+    def place_order(self, base, quote, quantity, side, order_type, time_in_force=None, limit_price=None, slippage_bps=None, client_order_id=None, v3 = False, client_order_uuid=None):
         """
         Get a two_way, buy or sell quote for a token pair.
         :param base: (str) base token e.g. BTC, ETH
