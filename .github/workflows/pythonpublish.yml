@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@19e4675e06535f6b54e894da5c1f044400bb4996
       with:
         python-version: '3.x'
     - name: Install dependencies
