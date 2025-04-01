@@ -95,7 +95,7 @@ class FalconxClient:
             "client_order_id": client_order_id
         }
 
-        response = self.session.post(self.url + 'quotes', json=params)
+        response = self.session.post(self.v3_url + 'quotes', json=params)
         return self._process_response(response)
 
     def place_order(self, base, quote, quantity, side, order_type, time_in_force=None, limit_price=None, slippage_bps=None, client_order_id=None, v3 = False, client_order_uuid=None):
@@ -156,7 +156,7 @@ class FalconxClient:
             },
             'quantity': {
                 'token': base,
-                'value': quantity if v3 else str(quantity)
+                'value': quantity
             },
             'side': side,
             'order_type': order_type,
@@ -168,8 +168,7 @@ class FalconxClient:
         if client_order_uuid:
             params['client_order_uuid'] = client_order_uuid
 
-        order_url = self.v3_url if v3 else self.url
-        response = self.session.post(order_url + 'order', json=params)
+        response = self.session.post(self.v3_url + 'order', json=params)
         return self._process_response(response)
 
     def execute_quote(self, fx_quote_id, side):
@@ -206,7 +205,7 @@ class FalconxClient:
             'side': side
         }
 
-        response = self.session.post(self.url + 'quotes/execute', json=params, auth=self.auth)
+        response = self.session.post(self.v3_url + 'quotes/execute', json=params, auth=self.auth)
         return self._process_response(response)
 
     def get_quote_status(self, fx_quote_id):
