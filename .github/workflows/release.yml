@@ -1,0 +1,47 @@
+name: Upload Python Package
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+    permissions:
+            contents: read
+    steps:
+      - uses: actions/checkout@09d2acae674a48949e3602304ab46fd20ae0c42f
+
+      - uses: actions/setup-python@532b046aaf352bab5717122cc0ea52b7f12266a3
+        with:
+          python-version: "3.x"
+
+      - name: build release distributions
+        run: |
+          # NOTE: put your own distribution build steps here.
+          python -m pip install build
+          python -m build
+
+      - name: upload to dists
+        uses: actions/upload-artifact@de65e23aa2b7e23d713bb51fbfcb6d502f8667d8
+        with:
+          name: release-dists
+          path: dist/
+
+  pypi-publish:
+    runs-on: ubuntu-latest
+    needs:
+      - release-build
+    permissions:
+      id-token: write
+    environment: release
+    steps:
+      - name: Retrieve release distributions
+        uses: actions/download-artifact@448e3f862ab3ef47aa50ff917776823c9946035b
+        with:
+          name: release-dists
+          path: dist/
+
+      - name: Publish release distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@e9ccbe5a211ba3e8363f472cae362b56b104e796
