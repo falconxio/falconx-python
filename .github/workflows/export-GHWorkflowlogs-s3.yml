@@ -1,0 +1,135 @@
+name: Export GHA Runner Logs To S3
+on:
+  workflow_run:
+    workflows: ["Upload Python Package", "Upload Python Package"]
+    types: [completed]
+    
+
+permissions:
+  id-token: write # required for authenticating with AWS using OIDC
+  actions: read # required for export-workflow-logs to retrieve workflow logs
+
+jobs:
+  export-gha-runner-logs:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Reference: https://github.com/aws-actions/configure-aws-credentials/tree/main#retrieving-credentials-from-step-output-assumerole-with-temporary-credentials
+      - name: Configure AWS Credentials
+        id: configure_aws
+        # Pinned to v4.0.2 commit SHA for aws-actions/configure-aws-credentials
+        # See: https://github.com/aws-actions/configure-aws-credentials/releases/tag/v4.0.2
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
+        with:
+          role-to-assume: arn:aws:iam::268987072234:role/github-actions-workflows-access
+          aws-region: us-east-1
+          output-credentials: true
+
+      # Download workflow logs from GitHub API
+      - name: Download and extract workflow logs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Create temporary directories
+          mkdir -p /tmp/logs /tmp/extracted
+          
+          # Download workflow logs using GitHub API
+          echo "Downloading logs for run ID: $RUN_ID"
+          curl -L \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$REPO/actions/runs/$RUN_ID/logs" -o /tmp/logs/workflow-logs.zip
+          
+          echo "Downloaded logs to: /tmp/logs/workflow-logs.zip"
+          echo "File size: $(ls -lh /tmp/logs/workflow-logs.zip | awk '{print $5}')"
+          
+          # Extract the zip file
+          cd /tmp/extracted
+          unzip -q /tmp/logs/workflow-logs.zip
+          
+          echo "Extracted logs to: /tmp/extracted"
+          echo "Contents:"
+          find . -type f | head -20
+
+      # Upload individual text files to S3 organized by workflow name
+      - name: Upload individual log files to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ steps.configure_aws.outputs.aws-access-key-id }}
+          AWS_SECRET_ACCESS_KEY: ${{ steps.configure_aws.outputs.aws-secret-access-key }}
+          AWS_SESSION_TOKEN: ${{ steps.configure_aws.outputs.aws-session-token }}
+          AWS_DEFAULT_REGION: us-east-1
+          S3_BUCKET_NAME: "test-github-actions-workflow-logs"  # ← Change this to your S3 bucket name
+        run: |
+          cd /tmp/extracted
+          
+          # Set up naming convention for files
+          WORKFLOW_NAME="${{ github.event.workflow_run.name }}"
+          RUN_ID="${{ github.event.workflow_run.id }}"
+          CREATED_AT="${{ github.event.workflow_run.created_at }}"
+          
+          # Counter for uploaded files
+          UPLOADED_COUNT=0
+          
+          echo "=== Uploading individual log files to S3 ==="
+          echo "Primary Workflow: $WORKFLOW_NAME"
+          echo "Run ID: $RUN_ID"
+          echo "Created: $CREATED_AT"
+          echo "S3 Bucket: $S3_BUCKET_NAME"
+          echo ""
+          
+          # Find and upload all text-based files
+          find . -type f \( -name "*.txt" -o -name "*.log" -o -name "*.out" -o -name "*.err" -o -name "*.stdout" -o -name "*.stderr" \) | while read -r file; do
+            # Get the relative path from extracted directory
+            RELATIVE_PATH=$(echo "$file" | sed 's|^\./||')
+            
+            # Create S3 key: workflow-name/timestamp-runId-filename
+            # This maintains the folder structure by workflow name
+            FILENAME=$(basename "$file")
+            S3_KEY="${WORKFLOW_NAME}/${CREATED_AT}-runId-${RUN_ID}-${RELATIVE_PATH//\//-}"
+            
+            echo "Uploading: $file -> s3://$S3_BUCKET_NAME/$S3_KEY"
+            
+            # Upload the file
+            aws s3 cp "$file" "s3://$S3_BUCKET_NAME/$S3_KEY"
+            
+            UPLOADED_COUNT=$((UPLOADED_COUNT + 1))
+          done
+          
+          # If no specific text files found, try to upload any file that appears to be text
+          if [ $UPLOADED_COUNT -eq 0 ]; then
+            echo "No standard log files found. Checking for other text files..."
+            
+            find . -type f -exec file {} \; | grep -i text | cut -d: -f1 | head -20 | while read -r file; do
+              RELATIVE_PATH=$(echo "$file" | sed 's|^\./||')
+              FILENAME=$(basename "$file")
+              S3_KEY="${WORKFLOW_NAME}/${CREATED_AT}-runId-${RUN_ID}-${RELATIVE_PATH//\//-}"
+              
+              echo "Uploading detected text file: $file -> s3://$S3_BUCKET_NAME/$S3_KEY"
+              aws s3 cp "$file" "s3://$S3_BUCKET_NAME/$S3_KEY"
+              
+              UPLOADED_COUNT=$((UPLOADED_COUNT + 1))
+            done
+          fi
+          
+          echo ""
+          echo "=== Upload Summary ==="
+          echo "Primary Workflow: $WORKFLOW_NAME"
+          echo "Total files uploaded: $UPLOADED_COUNT"
+          echo "S3 Bucket: $S3_BUCKET_NAME"
+          echo "Folder structure: $WORKFLOW_NAME/{timestamp-runId-filename}"
+          echo "File format: Individual text files (no ZIP archives)"
+          
+          # List uploaded files for this workflow run
+          echo ""
+          echo "Files uploaded to S3:"
+
+          aws s3 ls "s3://$S3_BUCKET_NAME/$WORKFLOW_NAME/" --recursive | grep "$RUN_ID" | tail -20
+
+      # Cleanup temporary files
+      - name: Cleanup temporary files
+        if: always()
+        run: |
+          rm -rf /tmp/logs /tmp/extracted
