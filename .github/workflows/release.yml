@@ -7,7 +7,7 @@ on:
 
 jobs:
   release-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-2core  # Static IP runner
     permissions:
             contents: read
     steps:
@@ -30,7 +30,7 @@ jobs:
           path: dist/
 
   pypi-publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-2core  # Static IP runner
     needs:
       - release-build
     permissions:
