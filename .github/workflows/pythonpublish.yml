@@ -4,15 +4,18 @@ on:
   release:
     types: [created]
 
+permissions:
+  contents: read
+
 jobs:
   release-build:
-    runs-on: ubuntu-2core
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@85e6279cec87321a52edac9c87bce653a07cf6c2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Set up Python
-        uses: actions/setup-python@19e4675e06535f6b54e894da5c1f044400bb4996
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce70c38
         with:
           python-version: '3.x'
       - name: Build release distributions
@@ -20,20 +23,21 @@ jobs:
           python -m pip install build
           python -m build
       - name: Upload release distributions
-        uses: actions/upload-artifact@de65e23aa2b7e23d713bb51fbfcb6d502f8667d8
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf88f
         with:
           name: release-dists
           path: dist/
 
   pypi-publish:
-    runs-on: ubuntu-2core
+    runs-on: ubuntu-latest
     needs: release-build
     permissions:
       id-token: write
+      contents: read
     environment: release
     steps:
       - name: Retrieve release distributions
-        uses: actions/download-artifact@448e3f862ab3ef47aa50ff917776823c9946035b
+        uses: actions/download-artifact@fa0a91b85d4f404e44d800e3a702b8d42d0979a4
         with:
           name: release-dists
           path: dist/
